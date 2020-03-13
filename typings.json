@@ -1,0 +1,5 @@
+{
+    "ambientDependencies": {
+        "xregexp": "github:DefinitelyTyped/DefinitelyTyped/xregexp/xregexp.d.ts"
+    }
+}
