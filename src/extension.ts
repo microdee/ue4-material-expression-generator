@@ -1,5 +1,7 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
+import * as fs from 'fs';
+import * as path from 'path';
 import * as vscode from 'vscode';
 import * as Mustache from 'mustache';
 import * as clipboardy from 'clipboardy';
@@ -34,6 +36,20 @@ Begin Object Class=/Script/UnrealEd.MaterialGraphNode Name="MaterialGraphNode_10
 End Object
 `
 
+function expandInclude(content: string, docPath: string, recDepth: number = 0): string {
+	if(recDepth > 100)
+	{
+		throw new Error("Reached maximum recursion depth of 100 while expanding includes. Do you have circular include?");
+	}
+	return content.replace(/#include\s"(.*?)",?/gm, (pattern, inclPath) => 
+	{
+		let absPath = path.resolve(docPath, inclPath);
+		let inclContent: string = fs.readFileSync(absPath).toString();
+
+		return expandInclude(inclContent, path.dirname(absPath), recDepth + 1);
+	});
+}
+
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
@@ -56,6 +72,7 @@ export function activate(context: vscode.ExtensionContext) {
 		}
 		
 		let docText = editor.document.getText();
+		let docPath = path.dirname(editor.document.fileName);
 		let entryPointMatch = rgxEntryPoint.exec(docText);
 		if(!entryPointMatch)
 		{
@@ -65,8 +82,14 @@ export function activate(context: vscode.ExtensionContext) {
 		console.log(`Main Entrypoint found with parameters ${entryPointMatch[1]}`);
 		
 		let params: [string];
+		let code: string = entryPointMatch[3];
+
+		code = expandInclude(code, docPath);
+
+		code = code.replace(/\n/gm, '\\n').replace(/\r/gm, '\\r');
+
 		let result: Snippet = {
-			code: entryPointMatch[3].replace(/\n/gm, '\\n').replace(/\r/gm, '\\r'),
+			code: code,
 			n: entryPointMatch[1],
 			inputs: []
 		}
