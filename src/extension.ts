@@ -80,7 +80,7 @@ export function activate(context: vscode.ExtensionContext) {
 		let entryPointMatch = rgxEntryPoint.exec(docText);
 		if(!entryPointMatch)
 		{
-			vscode.window.showErrorMessage("Couldn't find an entrypoint! (put '// UE4 Snippet' comment after your shader function)");
+			vscode.window.showErrorMessage("Couldn't find an entrypoint!");
 			return;
 		}
 		console.log(`Main Entrypoint found with parameters ${entryPointMatch[1]}`);
