@@ -66,7 +66,7 @@ export function activate(context: vscode.ExtensionContext) {
 	let disposable = vscode.commands.registerCommand('extension.generateUe4Node', () => {
 		// The code you place here will be executed every time your command is executed
 		
-		let rgxEntryPoint = new RegExp(/float(\d)\smain\(([\w\s:,]*)\).*?^{(.*?)^}/msi);
+		let rgxEntryPoint = new RegExp(/float(\d?)\smain\(([\w\s:,]*)\).*?^{(.*?)^}/msi);
 
 		let editor = vscode.window.activeTextEditor;
 		if(!editor)
@@ -83,10 +83,11 @@ export function activate(context: vscode.ExtensionContext) {
 			vscode.window.showErrorMessage("Couldn't find an entrypoint!");
 			return;
 		}
-		console.log(`Main Entrypoint found with parameters ${entryPointMatch[1]}`);
-		
-		let params: [string];
-		let code: string = entryPointMatch[3];
+        console.log(`Main Entrypoint found with parameters ${entryPointMatch[2]}`);
+        
+        let code: string = entryPointMatch[3];
+        let returnN: string = entryPointMatch[1];
+        if(returnN.length == 0) returnN = "1";
 
 		code = expandInclude(code, docPath);
 
@@ -97,7 +98,7 @@ export function activate(context: vscode.ExtensionContext) {
 
 		let result: Snippet = {
 			code: code,
-			n: entryPointMatch[1],
+			n: returnN,
 			inputs: []
 		}
 
