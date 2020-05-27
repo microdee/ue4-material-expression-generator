@@ -43,10 +43,14 @@ function expandInclude(content: string, docPath: string, recDepth: number = 0): 
 	}
 	return content.replace(/#include\s"(.*?)",?/gm, (pattern, inclPath) => 
 	{
-		let absPath = path.resolve(docPath, inclPath);
-		let inclContent: string = fs.readFileSync(absPath).toString();
+        let absPath = path.resolve(docPath, inclPath);
+        if(fs.existsSync(absPath))
+        {          
+            let inclContent: string = fs.readFileSync(absPath).toString();
 
-		return expandInclude(inclContent, path.dirname(absPath), recDepth + 1);
+            return expandInclude(inclContent, path.dirname(absPath), recDepth + 1);
+        }
+        return `#include "${inclPath}"`;
 	});
 }
 
@@ -86,7 +90,10 @@ export function activate(context: vscode.ExtensionContext) {
 
 		code = expandInclude(code, docPath);
 
-		code = code.replace(/\n/gm, '\\n').replace(/\r/gm, '\\r');
+        code = code
+            .replace(/\n/gm, '\\n')
+            .replace(/\r/gm, '\\r')
+            .replace(/"/gm, '\\"');
 
 		let result: Snippet = {
 			code: code,
