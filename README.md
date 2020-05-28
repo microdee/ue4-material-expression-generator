@@ -12,6 +12,10 @@ float4 main(float2 uv : TEXCOORD0) : SV_Target0
 }
 ```
 
+* Enter **Generate UE4 Material Expression Node** in command palette to copy an entire node to clipboard
+* Enter **Generate text for UE4 Material Expression** to copy only the expanded text to clipboard
+  * (used for iterations)
+
 this extension assumes that the main function is in global scope, its definition starts right at the beginning of line and the enclosing curly brackets are also both are the first characters on a line as seen above.
 
 You can include other files in your code and this extension will recursively expand them for the expression node. Includes are always relative to their containing file.
