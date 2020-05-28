@@ -58,31 +58,42 @@ function expandInclude(content: string, docPath: string, recDepth: number = 0): 
 // your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
 
-    function parseCode(): RegExpExecArray
+    function getDocText(): string
     {
-		let rgxEntryPoint = new RegExp(/float(\d?)\smain\(([\w\s:,]*)\).*?^{(.*?)^}/msi);
-
 		let editor = vscode.window.activeTextEditor;
 		if(!editor)
 		{
 			vscode.window.showErrorMessage('No active document is open');
-			return;
-		}
+			return "";
+        }
+        return editor.document.getText();
+    }
+
+    function parseCode(): RegExpExecArray[]
+    {
+		let rgxEntryPoint = new RegExp(/float(\d?)\smain\(([\w\s:,]*)\).*?^{(.*?)^}/msi);
 		
-        let docText = editor.document.getText();
+        let docText = getDocText();
         
 		let entryPointMatch = rgxEntryPoint.exec(docText);
 		if(!entryPointMatch)
 		{
 			vscode.window.showErrorMessage("Couldn't find an entrypoint!");
-			return;
+			return [];
 		}
         console.log(`Main Entrypoint found with parameters ${entryPointMatch[2]}`);
-        return entryPointMatch;
+        return [ entryPointMatch ];
     }
 
     function generateCode(code: string, escape: boolean): string
     {
+		let editor = vscode.window.activeTextEditor;
+		if(!editor)
+		{
+			vscode.window.showErrorMessage('No active document is open');
+			return "";
+        }
+        
         let docPath = path.dirname(editor.document.fileName);
         let outCode = expandInclude(code, docPath);
         if(escape)
@@ -105,14 +116,17 @@ export function activate(context: vscode.ExtensionContext) {
 	// The commandId parameter must match the command field in package.json
 	let generateNodeCommand = vscode.commands.registerCommand('extension.generateUe4Node', () => {
 		// The code you place here will be executed every time your command is executed
-		
-		let entryPointMatch = parseCode();
+        let parsed = parseCode();
+        if(parsed.length <= 0) return;
+        let entryPointMatch = parsed[0];
+        
+        let docText = getDocText();
         
         let code: string = entryPointMatch[3];
         let returnN: string = entryPointMatch[1];
         if(returnN.length == 0) returnN = "1";
 
-		code = generateCode(code, true);
+        code = generateCode(code, true);
 
 		let result: Snippet = {
 			code: code,
@@ -149,7 +163,10 @@ export function activate(context: vscode.ExtensionContext) {
 	let generateTextCommand = vscode.commands.registerCommand('extension.generateUe4NodeText', () => {
 		// The code you place here will be executed every time your command is executed
 		
-		let entryPointMatch = parseCode();
+        let parsed = parseCode();
+        if(parsed.length <= 0) return;
+        let entryPointMatch = parsed[0];
+        
 		let code = generateCode(entryPointMatch[3], false);
 		clipboardy.writeSync(code);
 
