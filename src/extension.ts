@@ -92,6 +92,9 @@ export function activate(context: vscode.ExtensionContext) {
 		code = expandInclude(code, docPath);
 
         code = code
+            .replace(/\\[\n\r][\n\r]/gm, ' ')
+            .replace(/\\[\n\r]/gm, ' ');
+        code = code
             .replace(/\n/gm, '\\n')
             .replace(/\r/gm, '\\r')
             .replace(/"/gm, '\\"');

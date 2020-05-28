@@ -7,7 +7,7 @@
 		"url": "https://github.com/microdee/ue4-material-expression-generator"
 	},
 	"description": "Generate Material Expression nodes from HLSL code",
-	"version": "0.0.2",
+	"version": "0.0.4",
 	"engines": {
 		"vscode": "^1.38.0"
 	},
