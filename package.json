@@ -22,7 +22,11 @@
 		"commands": [
 			{
 				"command": "extension.generateUe4Node",
-				"title": "Generate UE4 Material Expression"
+				"title": "Generate UE4 Material Expression Node"
+			},
+			{
+				"command": "extension.generateUe4NodeText",
+				"title": "Generate text for UE4 Material Expression"
 			}
 		]
 	},
