@@ -96,11 +96,11 @@ export function activate(context: vscode.ExtensionContext) {
         
         let docPath = path.dirname(editor.document.fileName);
         let outCode = expandInclude(code, docPath);
+        outCode = outCode
+            .replace(/\\[\n\r][\n\r]/gm, ' ')
+            .replace(/\\[\n\r]/gm, ' ');
         if(escape)
         {
-            outCode = outCode
-                .replace(/\\[\n\r][\n\r]/gm, ' ')
-                .replace(/\\[\n\r]/gm, ' ');
             outCode = outCode
                 .replace(/\n/gm, '\\n')
                 .replace(/\r/gm, '\\r')
