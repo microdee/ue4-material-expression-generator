@@ -15,7 +15,8 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:extension.generateUe4Node"
+		"onCommand:extension.generateUe4Node",
+		"onCommand:extension.generateUe4NodeText"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
